@@ -9,4 +9,4 @@ do
   esac
 done
 
-cp -r src package.json yarn.lock .gitignore  $DIR
+cp -r src package.json yarn.lock .gitignore postcss.config.js webpack.config.base.js webpack.config.js $DIR
