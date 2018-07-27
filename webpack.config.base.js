@@ -1,12 +1,30 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
+const glob = require('glob')
 
 // base config
 const SRC = './src'
 const DEST = './dist'
 const HOST = process.env.HOST || '0.0.0.0'
 const PORT = process.env.PORT || 3000
+
+// ejs
+const ejs = glob.sync(`${__dirname}/src/html/**/*.ejs`)
+const templates = ejs.map((target) => {
+  const regexp = new RegExp(`${__dirname}/src/html`, 'g')
+  let basePath = path.dirname(target).replace(regexp, '')
+  if (basePath) {
+    basePath = `.${basePath}`
+  } else {
+    basePath = `./`
+  }
+
+  return new HtmlWebpackPlugin({
+    template: target,
+    filename: `${basePath}/${path.basename(target, path.extname(target))}.html`,
+  })
+})
 
 module.exports = {
   // エントリーファイル
@@ -83,9 +101,6 @@ module.exports = {
   plugins: [
     // style.cssを出力
     new ExtractTextPlugin('[name]'),
-    new HtmlWebpackPlugin({
-      template: `${SRC}/html/index.ejs`,
-      inject: 'body',
-    }),
+    ...templates
   ],
 }
